@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TeaLeaf AI - Hệ thống Chẩn đoán Bệnh Lá Chè</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans">
+
+    <!-- Navbar -->
+    <header class="bg-emerald-800 text-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <span class="text-2xl font-bold">🌿 TeaLeaf AI</span>
+            </div>
+            <nav class="hidden md:flex space-x-6 text-sm font-medium">
+                <a href="#diagnostic" class="hover:text-emerald-200 transition">Chẩn đoán AI</a>
+                <a href="#chapter1" class="hover:text-emerald-200 transition">Chương 1: Lý Thuyết</a>
+                <a href="#chapter2" class="hover:text-emerald-200 transition">Chương 2: Mô Hình</a>
+                <a href="#chapter3" class="hover:text-emerald-200 transition">Chương 3: Thực Nghiệm</a>
+                <a href="#domain" class="hover:text-emerald-200 transition">Quản lý Tên Miền</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-r from-emerald-900 to-teal-800 text-white py-16">
+        <div class="container mx-auto px-6 text-center">
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-4">Hệ Thống Chẩn Đoán Bệnh Lá Chè</h1>
+            <p class="text-lg md:text-xl text-emerald-100 max-w-2xl mx-auto mb-8">
+                Ứng dụng mạng nơ-ron tích chập sâu **MobileNetV2** nhằm nhận diện chính xác các bệnh hại trên lá chè từ ảnh thực địa.
+            </p>
+            <a href="#diagnostic" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-8 rounded-full shadow-lg transition">Trải nghiệm ngay</a>
+        </div>
+    </section>
+
+    <main class="container mx-auto px-6 py-10 space-y-16">
+
+        <!-- Diagnostic Tool Section -->
+        <section id="diagnostic" class="bg-white rounded-2xl shadow-xl p-8 border border-emerald-100">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-emerald-900">🔬 Công Cụ Chẩn Đoán Bệnh Trực Tuyến</h2>
+                <p class="text-slate-600 mt-2">Tải lên hình ảnh lá chè hoặc chọn mẫu có sẵn từ tập dữ liệu của bạn để hệ thống phân tích.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                <!-- Upload Box -->
+                <div class="border-2 border-dashed border-emerald-300 rounded-xl p-6 text-center bg-emerald-50/50 hover:bg-emerald-50 transition cursor-pointer" id="drop-zone">
+                    <input type="file" id="file-input" class="hidden" accept="image/*">
+                    <div id="upload-prompt" onclick="document.getElementById('file-input').click()">
+                        <svg class="mx-auto h-12 text-emerald-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                        <p class="text-sm font-semibold text-slate-700">Nhấp để tải ảnh lên hoặc kéo thả vào đây</p>
+                        <p class="text-xs text-slate-500 mt-1">Hỗ trợ PNG, JPG, JPEG</p>
+                    </div>
+                    <div id="preview-container" class="hidden mt-4">
+                        <img id="image-preview" class="max-h-64 mx-auto rounded-lg shadow" alt="Preview">
+                        <button onclick="resetUpload()" class="mt-3 text-xs text-red-600 font-semibold hover:underline">Chọn ảnh khác</button>
+                    </div>
+                </div>
+
+                <!-- Result Box -->
+                <div class="bg-slate-50 rounded-xl p-6 border border-slate-200 flex flex-col justify-between h-full">
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-800 mb-4 border-b pb-2">Kết quả phân tích mô hình</h3>
+                        <div id="result-placeholder" class="text-slate-400 text-center py-10">
+                            Chưa có ảnh được phân tích. Vui lòng tải ảnh lên bên trái.
+                        </div>
+                        <div id="result-content" class="hidden space-y-4">
+                            <div>
+                                <span class="text-xs font-bold text-slate-500 uppercase">Dự đoán bệnh:</span>
+                                <p id="res-disease" class="text-xl font-extrabold text-emerald-700"></p>
+                            </div>
+                            <div>
+                                <span class="text-xs font-bold text-slate-500 uppercase">Độ tin cậy (Confidence):</span>
+                                <div class="w-full bg-slate-200 rounded-full h-3 mt-1">
+                                    <div id="res-bar" class="bg-emerald-600 h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
+                                </div>
+                                <p id="res-confidence" class="text-sm font-semibold text-slate-600 mt-1 text-right"></p>
+                            </div>
+                            <div>
+                                <span class="text-xs font-bold text-slate-500 uppercase">Khuyến nghị điều trị:</span>
+                                <p id="res-treatment" class="text-sm text-slate-700 bg-white p-3 rounded-lg border border-slate-200 mt-1"></p>
+                            </div>
+                        </div>
+                    </div>
+                    <button id="btn-predict" onclick="runPrediction()" disabled class="mt-6 w-full bg-emerald-700 hover:bg-emerald-800 disabled:bg-slate-300 text-white font-bold py-3 px-4 rounded-xl shadow transition">
+                        Chạy Chẩn Đoán AI
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Chapter 1 -->
+        <section id="chapter1" class="bg-white rounded-2xl shadow-xl p-8 border border-slate-100">
+            <h2 class="text-2xl font-bold text-emerald-900 mb-4">CHƯƠNG 1. CƠ SỞ LÝ THUYẾT & TỔNG QUAN</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+                <div class="bg-emerald-50 p-6 rounded-xl border border-emerald-100">
+                    <h3 class="font-bold text-emerald-800 text-lg mb-2">1.1. Học Máy & Học Sâu</h3>
+                    <p class="text-sm text-slate-600">Khảo sát nền tảng Machine Learning và mạng nơ-ron sâu trong việc tự động trích xuất đặc trưng hình ảnh thay vì lập trình thủ công.</p>
+                </div>
+                <div class="bg-emerald-50 p-6 rounded-xl border border-emerald-100">
+                    <h3 class="font-bold text-emerald-800 text-lg mb-2">1.2. Bệnh Trên Lá Chè</h3>
+                    <p class="text-sm text-slate-600">Phân tích đặc điểm nhận diện của 8 nhóm bệnh phổ biến trong thư mục dataset: Phồng lá, Đốm nâu, Thán thư, Tảo đỏ...</p>
+                </div>
+                <div class="bg-emerald-50 p-6 rounded-xl border border-emerald-100">
+                    <h3 class="font-bold text-emerald-800 text-lg mb-2">1.3. Thách Thức Thực Địa</h3>
+                    <p class="text-sm text-slate-600">Giải quyết các vấn đề về ánh sáng phức tạp, góc chụp lệch và nhiễu nền khi chụp ảnh lá chè trực tiếp tại nương chè.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Chapter 2 -->
+        <section id="chapter2" class="bg-white rounded-2xl shadow-xl p-8 border border-slate-100">
+            <h2 class="text-2xl font-bold text-emerald-900 mb-4">CHƯƠNG 2. MÔ HÌNH VÀ PHƯƠNG PHÁP XÂY DỰNG</h2>
+            <p class="text-slate-600 mb-6">Đường ống xử lý dữ liệu (End-to-End Pipeline) từ khâu thu thập ảnh, tăng cường dữ liệu (Data Augmentation) đến huấn luyện mô hình MobileNetV2.</p>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
+                <div class="p-4 bg-slate-50 rounded-xl border">
+                    <span class="block text-xl font-bold text-emerald-700">Bước 1</span>
+                    <span class="text-sm text-slate-600">Thu thập & Gán nhãn 8 lớp bệnh</span>
+                </div>
+                <div class="p-4 bg-slate-50 rounded-xl border">
+                    <span class="block text-xl font-bold text-emerald-700">Bước 2</span>
+                    <span class="text-sm text-slate-600">Chuẩn hóa kích thước ảnh 224×224</span>
+                </div>
+                <div class="p-4 bg-slate-50 rounded-xl border">
+                    <span class="block text-xl font-bold text-emerald-700">Bước 3</span>
+                    <span class="text-sm text-slate-600">Huấn luyện MobileNetV2 Transfer Learning</span>
+                </div>
+                <div class="p-4 bg-slate-50 rounded-xl border">
+                    <span class="block text-xl font-bold text-emerald-700">Bước 4</span>
+                    <span class="text-sm text-slate-600">Đánh giá trên tập Test & Triển khai Web</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Chapter 3 -->
+        <section id="chapter3" class="bg-white rounded-2xl shadow-xl p-8 border border-slate-100">
+            <h2 class="text-2xl font-bold text-emerald-900 mb-4">CHƯƠNG 3. KẾT QUẢ THỰC NGHIỆM VÀ ĐÁNH GIÁ</h2>
+            <p class="text-slate-600 mb-6">Biểu đồ thể hiện độ chính xác (Accuracy) của mô hình qua 50 epochs huấn luyện trên tập dữ liệu kiểm định.</p>
+            <div class="max-w-3xl mx-auto bg-slate-50 p-4 rounded-xl border">
+                <canvas id="experimentChart"></canvas>
+            </div>
+        </section>
+
+        <!-- Domain Config Section -->
+        <section id="domain" class="bg-white rounded-2xl shadow-xl p-8 border border-slate-100">
+            <h2 class="text-2xl font-bold text-emerald-900 mb-4">🌐 Quản Lý & Cài Đặt Tên Miền Tùy Chỉnh</h2>
+            <p class="text-slate-600 mb-6">Nhập tên miền riêng của bạn để cấu hình hiển thị và xem trước liên kết.</p>
+            <div class="flex flex-col md:flex-row gap-4">
+                <input type="text" id="domain-input" placeholder="Ví dụ: chandoanlache.vn" class="flex-1 border border-slate-300 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-600">
+                <button onclick="updateDomain()" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold px-6 py-3 rounded-xl transition">Áp dụng Tên Miền</button>
+            </div>
+            <div id="domain-preview" class="mt-4 p-4 bg-emerald-50 rounded-xl border border-emerald-200 text-emerald-800 text-sm hidden">
+                ✅ Trạng thái: Tên miền đang hoạt động giả lập tại: <strong id="domain-display"></strong>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-emerald-900 text-emerald-200 py-8 mt-20 text-center text-sm">
+        <p>© 2026 TeaLeaf AI Project. Phát triển dựa trên nghiên cứu phân loại bệnh lá chè bằng MobileNetV2.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
